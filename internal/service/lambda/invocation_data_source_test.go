@@ -1,15 +1,18 @@
+// Copyright (c) HashiCorp, Inc.
+// SPDX-License-Identifier: MPL-2.0
+
 package lambda_test
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/service/lambda"
-	sdkacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	sdkacctest "github.com/hashicorp/terraform-plugin-testing/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 	"github.com/hashicorp/terraform-provider-aws/internal/acctest"
 	"github.com/hashicorp/terraform-provider-aws/internal/verify"
+	"github.com/hashicorp/terraform-provider-aws/names"
 )
 
 func testAccCheckInvocationResult(name, expectedResult string) resource.TestCheckFunc {
@@ -38,13 +41,14 @@ func testAccCheckInvocationResult(name, expectedResult string) resource.TestChec
 }
 
 func TestAccLambdaInvocationDataSource_basic(t *testing.T) {
+	ctx := acctest.Context(t)
 	rName := sdkacctest.RandomWithPrefix(acctest.ResourcePrefix)
 	testData := "value3"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:          func() { acctest.PreCheck(t) },
-		ErrorCheck:        acctest.ErrorCheck(t, lambda.EndpointsID),
-		ProviderFactories: acctest.ProviderFactories,
+		PreCheck:                 func() { acctest.PreCheck(ctx, t) },
+		ErrorCheck:               acctest.ErrorCheck(t, names.LambdaServiceID),
+		ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccInvocationDataSourceConfig_basic(rName, testData),
@@ -57,13 +61,14 @@ func TestAccLambdaInvocationDataSource_basic(t *testing.T) {
 }
 
 func TestAccLambdaInvocationDataSource_qualifier(t *testing.T) {
+	ctx := acctest.Context(t)
 	rName := sdkacctest.RandomWithPrefix(acctest.ResourcePrefix)
 	testData := "value3"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:          func() { acctest.PreCheck(t) },
-		ErrorCheck:        acctest.ErrorCheck(t, lambda.EndpointsID),
-		ProviderFactories: acctest.ProviderFactories,
+		PreCheck:                 func() { acctest.PreCheck(ctx, t) },
+		ErrorCheck:               acctest.ErrorCheck(t, names.LambdaServiceID),
+		ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccInvocationDataSourceConfig_qualifier(rName, testData),
@@ -76,13 +81,14 @@ func TestAccLambdaInvocationDataSource_qualifier(t *testing.T) {
 }
 
 func TestAccLambdaInvocationDataSource_complex(t *testing.T) {
+	ctx := acctest.Context(t)
 	rName := sdkacctest.RandomWithPrefix(acctest.ResourcePrefix)
 	testData := "value3"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:          func() { acctest.PreCheck(t) },
-		ErrorCheck:        acctest.ErrorCheck(t, lambda.EndpointsID),
-		ProviderFactories: acctest.ProviderFactories,
+		PreCheck:                 func() { acctest.PreCheck(ctx, t) },
+		ErrorCheck:               acctest.ErrorCheck(t, names.LambdaServiceID),
+		ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccInvocationDataSourceConfig_complex(rName, testData),
@@ -131,7 +137,7 @@ resource "aws_lambda_function" "lambda" {
   function_name = "%s"
   role          = aws_iam_role.lambda_role.arn
   handler       = "lambda_invocation.handler"
-  runtime       = "nodejs12.x"
+  runtime       = "nodejs20.x"
 
   environment {
     variables = {
@@ -162,7 +168,7 @@ resource "aws_lambda_function" "lambda" {
   function_name = "%s"
   role          = aws_iam_role.lambda_role.arn
   handler       = "lambda_invocation.handler"
-  runtime       = "nodejs12.x"
+  runtime       = "nodejs20.x"
   publish       = true
 
   environment {
@@ -195,7 +201,7 @@ resource "aws_lambda_function" "lambda" {
   function_name = "%s"
   role          = aws_iam_role.lambda_role.arn
   handler       = "lambda_invocation.handler"
-  runtime       = "nodejs12.x"
+  runtime       = "nodejs20.x"
   publish       = true
 
   environment {

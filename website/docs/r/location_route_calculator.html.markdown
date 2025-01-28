@@ -29,29 +29,38 @@ The following arguments are required:
 The following arguments are optional:
 
 * `description` - (Optional) The optional description for the route calculator resource.
-* `tags` - (Optional) Key-value tags for the route calculator. If configured with a provider [`default_tags` configuration block](https://www.terraform.io/docs/providers/aws/index.html#default_tags-configuration-block) present, tags with matching keys will overwrite those defined at the provider-level.
+* `tags` - (Optional) Key-value tags for the route calculator. If configured with a provider [`default_tags` configuration block](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#default_tags-configuration-block) present, tags with matching keys will overwrite those defined at the provider-level.
 
-## Attributes Reference
+## Attribute Reference
 
-In addition to all arguments above, the following attributes are exported:
+This resource exports the following attributes in addition to the arguments above:
 
 * `calculator_arn` - The Amazon Resource Name (ARN) for the Route calculator resource. Use the ARN when you specify a resource across AWS.
 * `create_time` - The timestamp for when the route calculator resource was created in ISO 8601 format.
 * `update_time` - The timestamp for when the route calculator resource was last update in ISO 8601.
-* `tags_all` - A map of tags assigned to the resource, including those inherited from the provider [`default_tags` configuration block](https://www.terraform.io/docs/providers/aws/index.html#default_tags-configuration-block).
+* `tags_all` - A map of tags assigned to the resource, including those inherited from the provider [`default_tags` configuration block](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#default_tags-configuration-block).
 
 ## Timeouts
 
-`aws_location_route_calculator` provides the following [Timeouts](https://www.terraform.io/docs/configuration/blocks/resources/syntax.html#operation-timeouts) configuration options:
+[Configuration options](https://developer.hashicorp.com/terraform/language/resources/syntax#operation-timeouts):
 
-* `create` - (Optional, Default: `30m`)
-* `update` - (Optional, Default: `30m`)
-* `delete` - (Optional, Default: `30m`)
+* `create` - (Default `30m`)
+* `update` - (Default `30m`)
+* `delete` - (Default `30m`)
 
 ## Import
 
-`aws_location_route_calculator` can be imported using the route calculator name, e.g.,
+In Terraform v1.5.0 and later, use an [`import` block](https://developer.hashicorp.com/terraform/language/import) to import `aws_location_route_calculator` using the route calculator name. For example:
 
+```terraform
+import {
+  to = aws_location_route_calculator.example
+  id = "example"
+}
 ```
-$ terraform import aws_location_route_calculator.example example
+
+Using `terraform import`, import `aws_location_route_calculator` using the route calculator name. For example:
+
+```console
+% terraform import aws_location_route_calculator.example example
 ```

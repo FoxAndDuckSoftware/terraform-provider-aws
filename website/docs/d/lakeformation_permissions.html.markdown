@@ -67,6 +67,7 @@ The following arguments are required:
 One of the following is required:
 
 * `catalog_resource` - Whether the permissions are to be granted for the Data Catalog. Defaults to `false`.
+* `data_cells_filter` - (Optional) Configuration block for a data cells filter resource. Detailed below.
 * `data_location` - Configuration block for a data location resource. Detailed below.
 * `database` - Configuration block for a database resource. Detailed below.
 * `lf_tag` - (Optional) Configuration block for an LF-tag resource. Detailed below.
@@ -78,11 +79,18 @@ The following arguments are optional:
 
 * `catalog_id` – (Optional) Identifier for the Data Catalog. By default, the account ID. The Data Catalog is the persistent metadata store. It contains database definitions, table definitions, and other control information to manage your Lake Formation environment.
 
+### data_cells_filter
+
+* `database_name` - (Required) The name of the database.
+* `name` - (Required) The name of the data cells filter.
+* `table_catalog_id` - (Required) The ID of the Data Catalog.
+* `table_name` - (Required) The name of the table.
+
 ### data_location
 
 The following argument is required:
 
-* `arn` – (Required) Amazon Resource Name (ARN) that uniquely identifies the data location resource.
+* `arn` – (Required) ARN that uniquely identifies the data location resource.
 
 The following argument is optional:
 
@@ -102,8 +110,8 @@ The following argument is optional:
 
 The following arguments are required:
 
-* `key` – (Required) The key-name for the tag.
-* `values` - (Required) A list of possible values an attribute can take.
+* `key` – (Required) Key-name for the tag.
+* `values` - (Required) List of possible values an attribute can take.
 
 The following argument is optional:
 
@@ -113,8 +121,8 @@ The following argument is optional:
 
 The following arguments are required:
 
-* `resource_type` – (Required) The resource type for which the tag policy applies. Valid values are `DATABASE` and `TABLE`.
-* `expression` - (Required) A list of tag conditions that apply to the resource's tag policy. Configuration block for tag conditions that apply to the policy. See [`expression`](#expression) below.
+* `resource_type` – (Required) Resource type for which the tag policy applies. Valid values are `DATABASE` and `TABLE`.
+* `expression` - (Required) List of tag conditions that apply to the resource's tag policy. Configuration block for tag conditions that apply to the policy. See [`expression`](#expression) below.
 
 The following argument is optional:
 
@@ -122,8 +130,8 @@ The following argument is optional:
 
 #### expression
 
-* `key` – (Required) The key-name of an LF-Tag.
-* `values` - (Required) A list of possible values of an LF-Tag.
+* `key` – (Required) Key-name of an LF-Tag.
+* `values` - (Required) List of possible values of an LF-Tag.
 
 ### table
 
@@ -150,7 +158,7 @@ The following arguments are optional:
 * `column_names` - (Optional) Set of column names for the table. At least one of `column_names` or `excluded_column_names` is required.
 * `excluded_column_names` - (Optional) Set of column names for the table to exclude. At least one of `column_names` or `excluded_column_names` is required.
 
-## Attributes Reference
+## Attribute Reference
 
 In addition to the above arguments, the following attribute is exported:
 

@@ -16,7 +16,7 @@ Terraform resource for managing an AWS AccessAnalyzer Archive Rule.
 
 ```terraform
 resource "aws_accessanalyzer_archive_rule" "example" {
-  analyser_name = "example-analyzer"
+  analyzer_name = "example-analyzer"
   rule_name     = "example-rule"
 
   filter {
@@ -41,30 +41,38 @@ resource "aws_accessanalyzer_archive_rule" "example" {
 The following arguments are required:
 
 * `analyzer_name` - (Required) Analyzer name.
-* `filter` - (Required) The filter criteria for the archive rule. See [Filter](#filter) for more details.
+* `filter` - (Required) Filter criteria for the archive rule. See [Filter](#filter) for more details.
 * `rule_name` - (Required) Rule name.
 
 ### Filter
 
 **Note** One comparator must be included with each filter.
 
-* `criteria` - (Required) The filter criteria.
+* `criteria` - (Required) Filter criteria.
 * `contains` - (Optional) Contains comparator.
 * `eq` - (Optional) Equals comparator.
 * `exists` - (Optional) Boolean comparator.
 * `neq` - (Optional) Not Equals comparator.
 
+## Attribute Reference
 
-## Attributes Reference
-
-In addition to all arguments above, the following attributes are exported:
+This resource exports the following attributes in addition to the arguments above:
 
 * `id` - Resource ID in the format: `analyzer_name/rule_name`.
 
 ## Import
 
-AccessAnalyzer ArchiveRule can be imported using the `analyzer_name/rule_name`, e.g.,
+In Terraform v1.5.0 and later, use an [`import` block](https://developer.hashicorp.com/terraform/language/import) to import AccessAnalyzer ArchiveRule using the `analyzer_name/rule_name`. For example:
 
+```terraform
+import {
+  to = aws_accessanalyzer_archive_rule.example
+  id = "example-analyzer/example-rule"
+}
 ```
-$ terraform import aws_accessanalyzer_archive_rule.example example-analyzer/example-rule
+
+Using `terraform import`, import AccessAnalyzer ArchiveRule using the `analyzer_name/rule_name`. For example:
+
+```console
+% terraform import aws_accessanalyzer_archive_rule.example example-analyzer/example-rule
 ```
