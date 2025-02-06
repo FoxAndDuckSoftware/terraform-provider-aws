@@ -1,5 +1,5 @@
 ---
-subcategory: "DS (Directory Service)"
+subcategory: "Directory Service"
 layout: "aws"
 page_title: "AWS: aws_directory_service_shared_directory_accepter"
 description: |-
@@ -37,9 +37,9 @@ The following arguments are required:
 
 * `shared_directory_id` - (Required) Identifier of the directory that is stored in the directory consumer account that corresponds to the shared directory in the owner account.
 
-## Attributes Reference
+## Attribute Reference
 
-In addition to all arguments above, the following attributes are exported:
+This resource exports the following attributes in addition to the arguments above:
 
 * `id` - Identifier of the shared directory.
 * `method` - Method used when sharing a directory (i.e., `ORGANIZATIONS` or `HANDSHAKE`).
@@ -47,10 +47,26 @@ In addition to all arguments above, the following attributes are exported:
 * `owner_account_id` - Account identifier of the directory owner.
 * `owner_directory_id` - Identifier of the Managed Microsoft AD directory from the perspective of the directory owner.
 
+## Timeouts
+
+`aws_directory_service_shared_directory_accepter` provides the following [Timeouts](https://developer.hashicorp.com/terraform/language/resources/syntax#operation-timeouts) configuration options:
+
+- `create` - (Default `60 minutes`) Used for directory creation
+- `delete` - (Default `60 minutes`) Used for directory deletion
+
 ## Import
 
-Directory Service Shared Directories can be imported using the shared directory ID, e.g.,
+In Terraform v1.5.0 and later, use an [`import` block](https://developer.hashicorp.com/terraform/language/import) to import Directory Service Shared Directories using the shared directory ID. For example:
 
+```terraform
+import {
+  to = aws_directory_service_shared_directory_accepter.example
+  id = "d-9267633ece"
+}
 ```
-$ terraform import aws_directory_service_shared_directory_accepter.example d-9267633ece
+
+Using `terraform import`, import Directory Service Shared Directories using the shared directory ID. For example:
+
+```console
+% terraform import aws_directory_service_shared_directory_accepter.example d-9267633ece
 ```

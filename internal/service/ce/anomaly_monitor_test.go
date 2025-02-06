@@ -1,16 +1,18 @@
+// Copyright (c) HashiCorp, Inc.
+// SPDX-License-Identifier: MPL-2.0
+
 package ce_test
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"regexp"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/service/costexplorer"
-	sdkacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/YakDriver/regexache"
+	awstypes "github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
+	sdkacctest "github.com/hashicorp/terraform-plugin-testing/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 	"github.com/hashicorp/terraform-provider-aws/internal/acctest"
 	"github.com/hashicorp/terraform-provider-aws/internal/conns"
 	tfce "github.com/hashicorp/terraform-provider-aws/internal/service/ce"
@@ -19,22 +21,23 @@ import (
 )
 
 func TestAccCEAnomalyMonitor_basic(t *testing.T) {
-	var monitor costexplorer.AnomalyMonitor
+	ctx := acctest.Context(t)
+	var monitor awstypes.AnomalyMonitor
 	resourceName := "aws_ce_anomaly_monitor.test"
 	rName := sdkacctest.RandomWithPrefix(acctest.ResourcePrefix)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:          func() { acctest.PreCheck(t) },
-		ProviderFactories: acctest.ProviderFactories,
-		CheckDestroy:      testAccCheckAnomalyMonitorDestroy,
-		ErrorCheck:        acctest.ErrorCheck(t, costexplorer.EndpointsID),
+		PreCheck:                 func() { acctest.PreCheck(ctx, t); testAccPreCheckPayerAccount(ctx, t) },
+		ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories,
+		CheckDestroy:             testAccCheckAnomalyMonitorDestroy(ctx),
+		ErrorCheck:               acctest.ErrorCheck(t, names.CEServiceID),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAnomalyMonitorConfig_basic(rName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckAnomalyMonitorExists(resourceName, &monitor),
-					resource.TestCheckResourceAttr(resourceName, "name", rName),
-					acctest.MatchResourceAttrGlobalARN(resourceName, "arn", "ce", regexp.MustCompile(`anomalymonitor/.+`)),
+					testAccCheckAnomalyMonitorExists(ctx, resourceName, &monitor),
+					resource.TestCheckResourceAttr(resourceName, names.AttrName, rName),
+					acctest.MatchResourceAttrGlobalARN(ctx, resourceName, names.AttrARN, "ce", regexache.MustCompile(`anomalymonitor/.+`)),
 					resource.TestCheckResourceAttr(resourceName, "monitor_type", "CUSTOM"),
 					resource.TestCheckResourceAttrSet(resourceName, "monitor_specification"),
 				),
@@ -49,21 +52,22 @@ func TestAccCEAnomalyMonitor_basic(t *testing.T) {
 }
 
 func TestAccCEAnomalyMonitor_disappears(t *testing.T) {
-	var monitor costexplorer.AnomalyMonitor
+	ctx := acctest.Context(t)
+	var monitor awstypes.AnomalyMonitor
 	resourceName := "aws_ce_anomaly_monitor.test"
 	rName := sdkacctest.RandomWithPrefix(acctest.ResourcePrefix)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:          func() { acctest.PreCheck(t) },
-		ProviderFactories: acctest.ProviderFactories,
-		CheckDestroy:      testAccCheckAnomalyMonitorDestroy,
-		ErrorCheck:        acctest.ErrorCheck(t, costexplorer.EndpointsID),
+		PreCheck:                 func() { acctest.PreCheck(ctx, t); testAccPreCheckPayerAccount(ctx, t) },
+		ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories,
+		CheckDestroy:             testAccCheckAnomalyMonitorDestroy(ctx),
+		ErrorCheck:               acctest.ErrorCheck(t, names.CEServiceID),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAnomalyMonitorConfig_basic(rName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckAnomalyMonitorExists(resourceName, &monitor),
-					acctest.CheckResourceDisappears(acctest.Provider, tfce.ResourceAnomalyMonitor(), resourceName),
+					testAccCheckAnomalyMonitorExists(ctx, resourceName, &monitor),
+					acctest.CheckResourceDisappears(ctx, acctest.Provider, tfce.ResourceAnomalyMonitor(), resourceName),
 				),
 				ExpectNonEmptyPlan: true,
 			},
@@ -72,22 +76,23 @@ func TestAccCEAnomalyMonitor_disappears(t *testing.T) {
 }
 
 func TestAccCEAnomalyMonitor_update(t *testing.T) {
-	var monitor costexplorer.AnomalyMonitor
+	ctx := acctest.Context(t)
+	var monitor awstypes.AnomalyMonitor
 	resourceName := "aws_ce_anomaly_monitor.test"
 	rName := sdkacctest.RandomWithPrefix(acctest.ResourcePrefix)
 	rName2 := sdkacctest.RandomWithPrefix(acctest.ResourcePrefix)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:          func() { acctest.PreCheck(t) },
-		ProviderFactories: acctest.ProviderFactories,
-		CheckDestroy:      testAccCheckAnomalyMonitorDestroy,
-		ErrorCheck:        acctest.ErrorCheck(t, costexplorer.EndpointsID),
+		PreCheck:                 func() { acctest.PreCheck(ctx, t); testAccPreCheckPayerAccount(ctx, t) },
+		ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories,
+		CheckDestroy:             testAccCheckAnomalyMonitorDestroy(ctx),
+		ErrorCheck:               acctest.ErrorCheck(t, names.CEServiceID),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAnomalyMonitorConfig_basic(rName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckAnomalyMonitorExists(resourceName, &monitor),
-					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					testAccCheckAnomalyMonitorExists(ctx, resourceName, &monitor),
+					resource.TestCheckResourceAttr(resourceName, names.AttrName, rName),
 				),
 			},
 			{
@@ -98,8 +103,8 @@ func TestAccCEAnomalyMonitor_update(t *testing.T) {
 			{
 				Config: testAccAnomalyMonitorConfig_basic(rName2),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckAnomalyMonitorExists(resourceName, &monitor),
-					resource.TestCheckResourceAttr(resourceName, "name", rName2),
+					testAccCheckAnomalyMonitorExists(ctx, resourceName, &monitor),
+					resource.TestCheckResourceAttr(resourceName, names.AttrName, rName2),
 				),
 			},
 		},
@@ -107,22 +112,23 @@ func TestAccCEAnomalyMonitor_update(t *testing.T) {
 }
 
 func TestAccCEAnomalyMonitor_tags(t *testing.T) {
-	var monitor costexplorer.AnomalyMonitor
+	ctx := acctest.Context(t)
+	var monitor awstypes.AnomalyMonitor
 	resourceName := "aws_ce_anomaly_monitor.test"
 	rName := sdkacctest.RandomWithPrefix(acctest.ResourcePrefix)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:          func() { acctest.PreCheck(t) },
-		ProviderFactories: acctest.ProviderFactories,
-		CheckDestroy:      testAccCheckAnomalyMonitorDestroy,
-		ErrorCheck:        acctest.ErrorCheck(t, costexplorer.EndpointsID),
+		PreCheck:                 func() { acctest.PreCheck(ctx, t); testAccPreCheckPayerAccount(ctx, t) },
+		ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories,
+		CheckDestroy:             testAccCheckAnomalyMonitorDestroy(ctx),
+		ErrorCheck:               acctest.ErrorCheck(t, names.CEServiceID),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccAnomalyMonitorConfig_tags1(rName, "key1", "value1"),
+				Config: testAccAnomalyMonitorConfig_tags1(rName, acctest.CtKey1, acctest.CtValue1),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccCheckAnomalyMonitorExists(resourceName, &monitor),
-					resource.TestCheckResourceAttr(resourceName, "tags.%", "1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.key1", "value1"),
+					testAccCheckAnomalyMonitorExists(ctx, resourceName, &monitor),
+					resource.TestCheckResourceAttr(resourceName, acctest.CtTagsPercent, "1"),
+					resource.TestCheckResourceAttr(resourceName, acctest.CtTagsKey1, acctest.CtValue1),
 				),
 			},
 			{
@@ -131,20 +137,20 @@ func TestAccCEAnomalyMonitor_tags(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccAnomalyMonitorConfig_tags2(rName, "key1", "value1updated", "key2", "value2"),
+				Config: testAccAnomalyMonitorConfig_tags2(rName, acctest.CtKey1, acctest.CtValue1Updated, acctest.CtKey2, acctest.CtValue2),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccCheckAnomalyMonitorExists(resourceName, &monitor),
-					resource.TestCheckResourceAttr(resourceName, "tags.%", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.key1", "value1updated"),
-					resource.TestCheckResourceAttr(resourceName, "tags.key2", "value2"),
+					testAccCheckAnomalyMonitorExists(ctx, resourceName, &monitor),
+					resource.TestCheckResourceAttr(resourceName, acctest.CtTagsPercent, "2"),
+					resource.TestCheckResourceAttr(resourceName, acctest.CtTagsKey1, acctest.CtValue1Updated),
+					resource.TestCheckResourceAttr(resourceName, acctest.CtTagsKey2, acctest.CtValue2),
 				),
 			},
 			{
-				Config: testAccAnomalyMonitorConfig_tags1(rName, "key2", "value2"),
+				Config: testAccAnomalyMonitorConfig_tags1(rName, acctest.CtKey2, acctest.CtValue2),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckAnomalyMonitorExists(resourceName, &monitor),
-					resource.TestCheckResourceAttr(resourceName, "tags.%", "1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.key2", "value2"),
+					testAccCheckAnomalyMonitorExists(ctx, resourceName, &monitor),
+					resource.TestCheckResourceAttr(resourceName, acctest.CtTagsPercent, "1"),
+					resource.TestCheckResourceAttr(resourceName, acctest.CtTagsKey2, acctest.CtValue2),
 				),
 			},
 		},
@@ -155,21 +161,22 @@ func TestAccCEAnomalyMonitor_tags(t *testing.T) {
 // such, if additional tests are added, they should be combined with the
 // following test in a serial test
 func TestAccCEAnomalyMonitor_Dimensional(t *testing.T) {
-	var monitor costexplorer.AnomalyMonitor
+	ctx := acctest.Context(t)
+	var monitor awstypes.AnomalyMonitor
 	resourceName := "aws_ce_anomaly_monitor.test"
 	rName := sdkacctest.RandomWithPrefix(acctest.ResourcePrefix)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:          func() { acctest.PreCheck(t) },
-		ProviderFactories: acctest.ProviderFactories,
-		CheckDestroy:      testAccCheckAnomalyMonitorDestroy,
-		ErrorCheck:        acctest.ErrorCheck(t, costexplorer.EndpointsID),
+		PreCheck:                 func() { acctest.PreCheck(ctx, t); testAccPreCheckPayerAccount(ctx, t) },
+		ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories,
+		CheckDestroy:             testAccCheckAnomalyMonitorDestroy(ctx),
+		ErrorCheck:               acctest.ErrorCheck(t, names.CEServiceID),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAnomalyMonitorConfig_dimensional(rName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckAnomalyMonitorExists(resourceName, &monitor),
-					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					testAccCheckAnomalyMonitorExists(ctx, resourceName, &monitor),
+					resource.TestCheckResourceAttr(resourceName, names.AttrName, rName),
 					resource.TestCheckResourceAttr(resourceName, "monitor_type", "DIMENSIONAL"),
 					resource.TestCheckResourceAttr(resourceName, "monitor_dimension", "SERVICE"),
 				),
@@ -183,59 +190,51 @@ func TestAccCEAnomalyMonitor_Dimensional(t *testing.T) {
 	})
 }
 
-func testAccCheckAnomalyMonitorExists(n string, anomalyMonitor *costexplorer.AnomalyMonitor) resource.TestCheckFunc {
+func testAccCheckAnomalyMonitorExists(ctx context.Context, n string, v *awstypes.AnomalyMonitor) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		conn := acctest.Provider.Meta().(*conns.AWSClient).CEConn
+		conn := acctest.Provider.Meta().(*conns.AWSClient).CEClient(ctx)
 
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
 		}
 
-		if rs.Primary.ID == "" {
-			return fmt.Errorf("No Cost Explorer Anomaly Monitor is set")
-		}
-
-		resp, err := tfce.FindAnomalyMonitorByARN(context.Background(), conn, rs.Primary.ID)
+		output, err := tfce.FindAnomalyMonitorByARN(ctx, conn, rs.Primary.ID)
 
 		if err != nil {
 			return err
 		}
 
-		if resp == nil {
-			return fmt.Errorf("Cost Explorer %q does not exist", rs.Primary.ID)
-		}
-
-		*anomalyMonitor = *resp
+		*v = *output
 
 		return nil
 	}
 }
 
-func testAccCheckAnomalyMonitorDestroy(s *terraform.State) error {
-	conn := acctest.Provider.Meta().(*conns.AWSClient).CEConn
+func testAccCheckAnomalyMonitorDestroy(ctx context.Context) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		conn := acctest.Provider.Meta().(*conns.AWSClient).CEClient(ctx)
 
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "aws_ce_anomaly_monitor" {
-			continue
+		for _, rs := range s.RootModule().Resources {
+			if rs.Type != "aws_ce_anomaly_monitor" {
+				continue
+			}
+
+			_, err := tfce.FindAnomalyMonitorByARN(ctx, conn, rs.Primary.ID)
+
+			if tfresource.NotFound(err) {
+				continue
+			}
+
+			if err != nil {
+				return err
+			}
+
+			return fmt.Errorf("Cost Explorer Anomaly Monitor %s still exists", rs.Primary.ID)
 		}
 
-		_, err := tfce.FindAnomalyMonitorByARN(context.Background(), conn, rs.Primary.ID)
-
-		if tfresource.NotFound(err) {
-			continue
-		}
-
-		if err != nil {
-			return err
-		}
-
-		return names.Error(names.CE, names.ErrActionCheckingDestroyed, tfce.ResAnomalyMonitor, rs.Primary.ID, errors.New("still exists"))
-
+		return nil
 	}
-
-	return nil
-
 }
 
 func testAccAnomalyMonitorConfig_basic(rName string) string {
@@ -252,7 +251,7 @@ resource "aws_ce_anomaly_monitor" "test" {
 	"Not": null,
 	"Or": null,
 	"Tags": {
-		"Key": "CostCenter",
+		"Key": "user:CostCenter",
 		"MatchOptions": null,
 		"Values": [
 			"10000"
@@ -278,7 +277,7 @@ resource "aws_ce_anomaly_monitor" "test" {
 	"Not": null,
 	"Or": null,
 	"Tags": {
-		"Key": "CostCenter",
+		"Key": "user:CostCenter",
 		"MatchOptions": null,
 		"Values": [
 			"10000"
@@ -308,7 +307,7 @@ resource "aws_ce_anomaly_monitor" "test" {
 	"Not": null,
 	"Or": null,
 	"Tags": {
-		"Key": "CostCenter",
+		"Key": "user:CostCenter",
 		"MatchOptions": null,
 		"Values": [
 			"10000"
